@@ -7,6 +7,7 @@
 #include <cstring>
 #include <optional>
 #include <string_view>
+#include <vector>
 
 namespace Pattern {
 
