@@ -19,16 +19,16 @@ jobs:
       - name: Setup MSVC (via Developer Command Prompt)
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: amd64
+          arch: amd64   # sets CL.EXE + LINK.EXE on PATH before cmake runs
 
       - name: Configure CMake
         run: |
-          cmake -B build -G "NMake Makefiles" `
-            -DCMAKE_BUILD_TYPE=Release `
-            -DCMAKE_GENERATOR_PLATFORM=x64
+          cmake -B build -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
+        # NMake Makefiles does not accept -DCMAKE_GENERATOR_PLATFORM.
+        # Architecture is controlled by the MSVC dev-cmd arch above (amd64 = x64).
 
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build
 
       - name: Upload DLL artifact
         uses: actions/upload-artifact@v4
