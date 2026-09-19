@@ -213,7 +213,7 @@ inline void run() {
     wc.lpfnWndProc   = wnd_proc;
     wc.hInstance     = GetModuleHandleA(nullptr);
     wc.hCursor       = LoadCursor(nullptr, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+    wc.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH); // ULW owns the surface; WM_PAINT must not paint black
     wc.lpszClassName = "OAR_ESP_OVERLAY";
     RegisterClassExA(&wc);
 
@@ -243,7 +243,10 @@ inline void run() {
         nullptr
     );
 
-    SetLayeredWindowAttributes(g_hwnd, TRANS_KEY, 0, LWA_COLORKEY);
+    // NOTE: do NOT call SetLayeredWindowAttributes here.
+    // This window uses UpdateLayeredWindow (ULW_COLORKEY) in render_frame — the two are
+    // mutually exclusive per MSDN. Mixing them causes undefined compositing behaviour
+    // (manifests as black screen when INSERT opens the menu / large ULW area is written).
     ShowWindow(g_hwnd, SW_SHOW);
     UpdateWindow(g_hwnd);
 
