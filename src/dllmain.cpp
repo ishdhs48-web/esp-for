@@ -129,7 +129,7 @@ static void esp_draw(HDC dc, HWND /*wnd*/) {
 
             // HP number
             std::string hp_str = std::to_string(a.health);
-            Overlay::draw_text(dc, bar_x - 24, bar_y + bar_h/2 - 6, hp_str, COL_TEXT, 10);
+            Overlay::draw_text(dc, bar_x - 24, bar_y + bar_h/2 - 6, hp_str, Overlay::COL_TEXT, 10);
         }
 
         // Distance
