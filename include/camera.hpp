@@ -18,10 +18,15 @@ namespace Camera {
 // APlayerController:
 //   +0x298  PlayerCameraManager (APlayerCameraManager*)
 //   +0x390  ControlRotation (FRotator) — local player rotation
-static constexpr ptrdiff_t k_off_pc_camera_manager = 0x2B8;  // UE4.27 x64
-static constexpr ptrdiff_t k_off_cam_loc            = 0x1EB0; // FCachedCameraView.Location
-static constexpr ptrdiff_t k_off_cam_rot            = 0x1EBC; // FCachedCameraView.Rotation
-static constexpr ptrdiff_t k_off_cam_fov            = 0x1EC8; // FCachedCameraView.FOV
+static constexpr ptrdiff_t k_off_pc_camera_manager = 0x2B8;  // APlayerController::PlayerCameraManager (dump confirmed)
+// APlayerCameraManager::CameraCache (FCameraCacheEntry) @ 0x0290
+// FCameraCacheEntry::POV (FMinimalViewInfo)             @ +0x0010  → 0x02A0
+// FMinimalViewInfo::Location                            @ +0x0000  → 0x02A0
+// FMinimalViewInfo::Rotation                            @ +0x000C  → 0x02AC
+// FMinimalViewInfo::FOV                                 @ +0x0018  → 0x02B8
+static constexpr ptrdiff_t k_off_cam_loc            = 0x02A0;
+static constexpr ptrdiff_t k_off_cam_rot            = 0x02AC;
+static constexpr ptrdiff_t k_off_cam_fov            = 0x02B8;
 
 // GEngine singleton — resolved once
 inline uintptr_t* g_engine_ptr = nullptr;
@@ -43,11 +48,11 @@ inline uintptr_t get_local_player_controller() {
     uintptr_t engine = *g_engine_ptr;
     if (!engine) return 0;
 
-    // UEngine + 0x210 → GameViewport (UGameViewportClient*)
-    uintptr_t viewport = *reinterpret_cast<uintptr_t*>(engine + 0x210);
+    // UEngine + 0x780 → GameViewport (UGameViewportClient*)  — dump: UEngine::GameViewport @ 0x0780
+    uintptr_t viewport = *reinterpret_cast<uintptr_t*>(engine + 0x780);
     if (!viewport) return 0;
-    // UGameViewportClient + 0x178 → GameInstance (UGameInstance*)  [4.27 standard]
-    uintptr_t game_instance = *reinterpret_cast<uintptr_t*>(viewport + 0x178);
+    // UGameViewportClient + 0x080 → GameInstance (UGameInstance*)  — dump: UGameViewportClient::GameInstance @ 0x0080
+    uintptr_t game_instance = *reinterpret_cast<uintptr_t*>(viewport + 0x080);
     if (!game_instance) return 0;
     // UGameInstance + 0x38 → LocalPlayers (TArray<ULocalPlayer*>)
     auto* local_players = reinterpret_cast<TArray<uintptr_t>*>(game_instance + 0x38);
